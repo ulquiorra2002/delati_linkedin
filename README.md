@@ -1,3 +1,2 @@
 # delati_linkedin EQUIPO 404
-##Instrucciones :
-  -ff
+**Este texto está en negrita**
