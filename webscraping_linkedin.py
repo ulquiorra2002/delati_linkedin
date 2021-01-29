@@ -34,7 +34,7 @@ def scraping_ofertas(con, url_principal, url_prefix, sufix_url, pagina_inicial, 
         url_pagina = url_prefix.replace('^',str(i))
         req = requests.get(url_pagina)
         soup = BeautifulSoup(req.text, "lxml")
-        avisos=soup.find('ul', class_='jobs-search__results-list').findAll('li',class_='result-card')
+        avisos=soup.find('ul', class_='jobs-search__results-list').findAll('li')
         for li in avisos:
                 oferta = {}
                 oferta["id_carga"] = id_carga
@@ -58,20 +58,24 @@ def scraping_ofertas(con, url_principal, url_prefix, sufix_url, pagina_inicial, 
                 # Accede al contenido HTML del detalle de la oferta en especifico
                 reqDeta = requests.get(oferta["url"])            
                 soup_deta = BeautifulSoup(reqDeta.text, "lxml")
-
                 aviso_deta = soup_deta.find("div", {"class": "show-more-less-html__markup"}).find_all("li")
-                texto = ""
-                for i in range (0,len(aviso_deta)-1):
-                    texto = texto + str(aviso_deta[i])
-                texto = texto.replace("<strong>","")
-                texto = texto.replace("</strong>","")
-                texto = texto.replace("<li>","")
-                texto = texto.replace("<br/>","")
-                texto = texto.replace("</u>","")
-                texto = texto.replace("</li>", "/")
-                texto = unicodedata.normalize("NFKD",re.sub('[-(),.¿?¡!<>;%#|°=:]','',texto.upper())).encode("ascii","ignore").decode("ascii")
-                if texto!=None:    
-                    oferta["detalle"]=texto[0:7998]
+                aviso_deta2 = soup_deta.find("div", {"class": "show-more-less-html__markup"}).find_all("p")
+                texto = ''
+                if aviso_deta!=[]:
+                    for i in range (0,len(aviso_deta)-1):
+                        texto = str(aviso_deta[i].get_text())
+                    texto = unicodedata.normalize("NFKD",re.sub('[-(),*¿?¡!.<>;%#|°=:]','',texto.upper())).encode("ascii","ignore").decode("ascii")
+                    texto = texto+'.'
+                    if texto!=None:    
+                        oferta["detalle"]=texto[0:7998]
+                else:
+                    for i in range (0,len(aviso_deta2)-1):
+                        texto = str(aviso_deta2[i].get_text())
+                    texto = unicodedata.normalize("NFKD",re.sub('[-(),*¿?¡!.<>;%#|°=:]','',texto.upper())).encode("ascii","ignore").decode("ascii")
+                    texto = texto.replace(".","")
+                    texto = texto+'.'
+                    if texto!=None:    
+                        oferta["detalle"]=texto[0:7998]                    
 
                 #--> descomentar esta linea para que se realice la insercion
                 oferta["id_oferta"]=controller.registrar_oferta(con, oferta)
@@ -89,8 +93,8 @@ def scraping_ofertadetalle(con,listaOferta):
     for i in range(0,len(listaOferta)-1):
         oferta = {}
         oferta["id_oferta"] =  listaOferta[i]["id_oferta"]
-        lista = listaOferta[i]["detalle"].split(sep='/')
-        print(lista)
+        lista = listaOferta[i]["detalle"].split(sep='.')
+        #print(lista)
         oferta["descripcion_tupla"]=""
         j=0
         for j in range(0,len(lista)-1):

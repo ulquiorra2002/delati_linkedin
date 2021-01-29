@@ -58,7 +58,7 @@ class DBOferta:
         # return row_id        
         mydb = connection.connect()
         cur = mydb.cursor()
-        sql0= "SELECT COUNT(url_oferta) FROM oferta WHERE url_oferta='"+str(oferta["url"])+"'"
+        sql0= "SELECT COUNT(id_anuncioempleo) FROM oferta WHERE id_anuncioempleo='"+str(oferta["id_anuncioempleo"])+"'"
         cur.execute(sql0)
         conteo = int(cur.fetchone()[0])
         cur.close()
@@ -71,9 +71,8 @@ class DBOferta:
                 params = (oferta["id_carga"], oferta["puesto"].strip(), oferta["empresa"].strip(), oferta["lugar"].strip(),oferta["salario"].strip(),oferta["detalle"].strip(), oferta["url"], oferta["url_pagina"],oferta["fecha_publicacion"],oferta["id_anuncioempleo"])
                 cur.execute(sql, params)        
                 mydb.commit()
-                print("--------------------------------------------------")
+                print("Oferta nueva: ")
                 print(oferta["url"])
-                print("--------------------------------------------------")
                 sql = "SELECT last_value FROM Oferta_id_oferta_seq"
                 cur.execute(sql)  
                 row_id = int(cur.fetchone()[0])
@@ -87,9 +86,12 @@ class DBOferta:
                     print (error)
                     mydb.close()        
         else :
+                mydb = connection.connect()
+                cur = mydb.cursor()
                 sql = "SELECT last_value FROM Oferta_id_oferta_seq"
                 cur.execute(sql)  
                 row_id = int(cur.fetchone()[0])
+                print("Oferta antigua: ")
                 print(row_id)
                 # close the communication with the PostgreSQL
                 cur.close()
