@@ -35,27 +35,7 @@ class DBOferta:
     def __init__(self):
         pass
 
-    def insert_oferta(self, connection, oferta):
-        # try:
-        #     mydb = connection.connect()
-        #     cur = mydb.cursor()                                    
-        #     sql = "insert into Oferta (id_webscraping, titulo,empresa,lugar,salario,oferta_detalle,url_oferta,url_pagina,fecha_creacion,fecha_modificacion,fecha_publicacion,id_anuncioempleo) values (%s,%s,%s,%s,%s,%s,%s,%s,current_date,current_date,%s,%s)"            
-        #     params = (oferta["id_carga"], oferta["puesto"].strip(), oferta["empresa"].strip(), oferta["lugar"].strip(),oferta["salario"].strip(),oferta["detalle"].strip(), oferta["url"], oferta["url_pagina"],oferta["fecha_publicacion"],oferta["id_anuncioempleo"])
-        #     cur.execute(sql, params)        
-        #     mydb.commit()  
-        #     sql = "SELECT last_value FROM Oferta_id_oferta_seq"
-        #     cur.execute(sql)  
-        #     row_id = int(cur.fetchone()[0])
-        #     print(row_id)
-        #     close the communication with the PostgreSQL
-        #     cur.close()
-        #     mydb.close()                           
-
-        # except (Exception, psycopg2.DatabaseError) as error:                
-        #         print ("-------------Exception, psycopg2.DatabaseError-------------------")
-        #         print (error)
-        #         mydb.close()        
-        # return row_id        
+    def insert_oferta(self, connection, oferta):   
         mydb = connection.connect()
         cur = mydb.cursor()
         sql0= "SELECT COUNT(id_anuncioempleo) FROM oferta WHERE id_anuncioempleo='"+str(oferta["id_anuncioempleo"])+"'"
@@ -71,12 +51,11 @@ class DBOferta:
                 params = (oferta["id_carga"], oferta["puesto"].strip(), oferta["empresa"].strip(), oferta["lugar"].strip(),oferta["salario"].strip(),oferta["detalle"].strip(), oferta["url"], oferta["url_pagina"],oferta["fecha_publicacion"],oferta["id_anuncioempleo"])
                 cur.execute(sql, params)        
                 mydb.commit()
-                print("Oferta nueva: ")
-                print(oferta["url"])
+                #print(oferta["url"])
                 sql = "SELECT last_value FROM Oferta_id_oferta_seq"
                 cur.execute(sql)  
                 row_id = int(cur.fetchone()[0])
-                print(row_id)
+                print("Oferta nueva:   "+str(row_id))
                 # close the communication with the PostgreSQL
                 cur.close()
                 mydb.close()                           
@@ -91,8 +70,8 @@ class DBOferta:
                 sql = "SELECT last_value FROM Oferta_id_oferta_seq"
                 cur.execute(sql)  
                 row_id = int(cur.fetchone()[0])
-                print("Oferta antigua: ")
-                print(row_id)
+                print("Oferta antigua: "+str(row_id))
+                #print(row_id)
                 # close the communication with the PostgreSQL
                 cur.close()
                 mydb.close()

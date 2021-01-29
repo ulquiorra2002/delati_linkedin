@@ -34,52 +34,54 @@ def scraping_ofertas(con, url_principal, url_prefix, sufix_url, pagina_inicial, 
         url_pagina = url_prefix.replace('^',str(i))
         req = requests.get(url_pagina)
         soup = BeautifulSoup(req.text, "lxml")
-        avisos=soup.find('ul', class_='jobs-search__results-list').findAll('li')
-        for li in avisos:
-                oferta = {}
-                oferta["id_carga"] = id_carga
-                # Almacena la url de la pagina
-                oferta["url_pagina"] = url_pagina
-                # Almacena la url de la oferta
-                oferta["url"]       =   li.find("a")['href']
-                print(oferta["url"])
-                oferta["puesto"]    =   li.find("h3", {"class": "result-card__title"}).get_text()
-                oferta["empresa"]   =   li.find("h4", {"class": "result-card__subtitle"}).get_text()
-                oferta["lugar"]     =   li.find("span", {"class": "job-result-card__location"}).get_text()
-                salario = li.find("span", {"class": "salaryText"})            
-                if salario!=None:                                            
-                    oferta["salario"]=salario.get_text()
-                else:
-                    oferta["salario"]=''
-                oferta["fecha_publicacion"]=li.find("time").get('datetime')
-                oferta["id_anuncioempleo"]=li.get('data-id')
+        avisos=soup.find('ul', class_='jobs-search__results-list')
+        if avisos !=None:
+            avisos=soup.find('ul', class_='jobs-search__results-list').find_all("li")
+            for li in avisos:
+                    oferta = {}
+                    oferta["id_carga"] = id_carga
+                    # Almacena la url de la pagina
+                    oferta["url_pagina"] = url_pagina
+                    # Almacena la url de la oferta
+                    oferta["url"]       =   li.find("a")['href']
+                    #print(oferta["url"])
+                    oferta["puesto"]    =   li.find("h3", {"class": "result-card__title"}).get_text()
+                    oferta["empresa"]   =   li.find("h4", {"class": "result-card__subtitle"}).get_text()
+                    oferta["lugar"]     =   li.find("span", {"class": "job-result-card__location"}).get_text()
+                    salario = li.find("span", {"class": "salaryText"})            
+                    if salario!=None:                                            
+                        oferta["salario"]=salario.get_text()
+                    else:
+                        oferta["salario"]=''
+                    oferta["fecha_publicacion"]=li.find("time").get('datetime')
+                    oferta["id_anuncioempleo"]=li.get('data-id')
+                    # Accede al contenido HTML del detalle de la oferta en especifico
+                    reqDeta = requests.get(oferta["url"])            
+                    soup_deta = BeautifulSoup(reqDeta.text, "lxml")
+                    aviso_deta = soup_deta.find("div", {"class": "show-more-less-html__markup"}).find_all("li")
+                    aviso_deta2 = soup_deta.find("div", {"class": "show-more-less-html__markup"}).find_all("p")
+                    texto = ''
+                    if aviso_deta!=[]:
+                        for i in range (0,len(aviso_deta)-1):
+                            texto = str(aviso_deta[i].get_text())
+                        texto = unicodedata.normalize("NFKD",re.sub('[-(),*¿?¡!.<>;%#|°=:]','',texto.upper())).encode("ascii","ignore").decode("ascii")
+                        texto = texto+'.'
+                        if texto!=None:    
+                            oferta["detalle"]=texto[0:7998]
+                    else:
+                        for i in range (0,len(aviso_deta2)-1):
+                            texto = str(aviso_deta2[i].get_text())
+                        texto = unicodedata.normalize("NFKD",re.sub('[-(),*¿?¡!.<>;%#|°=:]','',texto.upper())).encode("ascii","ignore").decode("ascii")
+                        texto = texto.replace(".","")
+                        texto = texto+'.'
+                        if texto!=None:    
+                            oferta["detalle"]=texto[0:7998]                    
 
-
-                # Accede al contenido HTML del detalle de la oferta en especifico
-                reqDeta = requests.get(oferta["url"])            
-                soup_deta = BeautifulSoup(reqDeta.text, "lxml")
-                aviso_deta = soup_deta.find("div", {"class": "show-more-less-html__markup"}).find_all("li")
-                aviso_deta2 = soup_deta.find("div", {"class": "show-more-less-html__markup"}).find_all("p")
-                texto = ''
-                if aviso_deta!=[]:
-                    for i in range (0,len(aviso_deta)-1):
-                        texto = str(aviso_deta[i].get_text())
-                    texto = unicodedata.normalize("NFKD",re.sub('[-(),*¿?¡!.<>;%#|°=:]','',texto.upper())).encode("ascii","ignore").decode("ascii")
-                    texto = texto+'.'
-                    if texto!=None:    
-                        oferta["detalle"]=texto[0:7998]
-                else:
-                    for i in range (0,len(aviso_deta2)-1):
-                        texto = str(aviso_deta2[i].get_text())
-                    texto = unicodedata.normalize("NFKD",re.sub('[-(),*¿?¡!.<>;%#|°=:]','',texto.upper())).encode("ascii","ignore").decode("ascii")
-                    texto = texto.replace(".","")
-                    texto = texto+'.'
-                    if texto!=None:    
-                        oferta["detalle"]=texto[0:7998]                    
-
-                #--> descomentar esta linea para que se realice la insercion
-                oferta["id_oferta"]=controller.registrar_oferta(con, oferta)
-                lista_oferta.append(oferta)
+                    #--> descomentar esta linea para que se realice la insercion
+                    oferta["id_oferta"]=controller.registrar_oferta(con, oferta)
+                    lista_oferta.append(oferta)
+        else:
+            print("\nNo se encuentran ofertas\n")
       
     return lista_oferta
 
