@@ -1,0 +1,1 @@
+SCHTASKS /CREATE /SC DAILY /TN "MyTasks\DELATI 404" /TR "D:\delati_linkedin\principal.py" /ST 00:00
