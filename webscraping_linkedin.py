@@ -75,7 +75,6 @@ def scraping_ofertas(con, url_principal, url_prefix, sufix_url, pagina_inicial, 
                         texto = texto.replace("</p>", "")
                         texto = texto.replace("</li>", "")
                         texto = unicodedata.normalize("NFKD",re.sub('[-(),*¿?/¡!+<>;%#|°=:]','',texto.upper())).encode("ascii","ignore").decode("utf-8",'ignore')
-                        print(texto)
                         if texto!=None:    
                             oferta["detalle"]=texto[0:7998]
                     else:
@@ -90,7 +89,6 @@ def scraping_ofertas(con, url_principal, url_prefix, sufix_url, pagina_inicial, 
                         texto = texto.replace("<p>", "")
                         texto = texto.replace("</p>", "")
                         texto = unicodedata.normalize("NFKD",re.sub('[-(),*¿?/¡!+<>;%#|°=:]','',texto.upper())).encode("ascii","ignore").decode("utf-8",'ignore')
-                        print(texto)
                         if texto!=None:    
                             oferta["detalle"]=texto[0:7998]                    
 
