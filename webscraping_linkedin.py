@@ -63,7 +63,8 @@ def scraping_ofertas(con, url_principal, url_prefix, sufix_url, pagina_inicial, 
                     texto = ''
                     if aviso_deta!=[]:
                         for i in range (0,len(aviso_deta)-1):
-                            texto = texto+str(aviso_deta[i])+"xyz"
+                            texto = texto+str(aviso_deta[i])+'.'
+                        texto = texto.replace(".NET","")
                         texto = texto.replace("<strong>","")
                         texto = texto.replace("</strong>","")
                         texto = texto.replace("<li>","")
@@ -73,12 +74,14 @@ def scraping_ofertas(con, url_principal, url_prefix, sufix_url, pagina_inicial, 
                         texto = texto.replace("<p>", "")
                         texto = texto.replace("</p>", "")
                         texto = texto.replace("</li>", "")
-                        texto = unicodedata.normalize("NFKD",re.sub('[-(),^/*¿?¡!._<>;%#|°=:]','',texto.upper())).encode("ascii","ignore").decode("ascii")
+                        texto = unicodedata.normalize("NFKD",re.sub('[-(),*¿?/¡!+<>;%#|°=:]','',texto.upper())).encode("ascii","ignore").decode("utf-8",'ignore')
+                        print(texto)
                         if texto!=None:    
                             oferta["detalle"]=texto[0:7998]
                     else:
                         for i in range (0,len(aviso_deta2)-1):
-                            texto = texto+str(aviso_deta2[i])+'xyz'
+                            texto = texto+str(aviso_deta2[i])+'.'
+                        texto = texto.replace(".NET","")
                         texto = texto.replace("<strong>","")
                         texto = texto.replace("</strong>","")
                         texto = texto.replace("<li>","")
@@ -86,7 +89,8 @@ def scraping_ofertas(con, url_principal, url_prefix, sufix_url, pagina_inicial, 
                         texto = texto.replace("<br/>","")
                         texto = texto.replace("<p>", "")
                         texto = texto.replace("</p>", "")
-                        texto = unicodedata.normalize("NFKD",re.sub('[-(),^/*¿?¡!._<>;%#|°=:]','',texto.upper())).encode("ascii","ignore").decode("ascii")
+                        texto = unicodedata.normalize("NFKD",re.sub('[-(),*¿?/¡!+<>;%#|°=:]','',texto.upper())).encode("ascii","ignore").decode("utf-8",'ignore')
+                        print(texto)
                         if texto!=None:    
                             oferta["detalle"]=texto[0:7998]                    
 
@@ -108,7 +112,7 @@ def scraping_ofertadetalle(con,listaOferta):
     for i in range(0,len(listaOferta)-1):
         oferta = {}
         oferta["id_oferta"] =  listaOferta[i]["id_oferta"]
-        lista = listaOferta[i]["detalle"].split(sep='XYZ')
+        lista = listaOferta[i]["detalle"].split(sep='.')
         print(lista)
         oferta["descripcion_tupla"]=""
         j=0
