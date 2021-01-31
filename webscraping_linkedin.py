@@ -58,8 +58,10 @@ def scraping_ofertas(con, url_principal, url_prefix, sufix_url, pagina_inicial, 
                     # Accede al contenido HTML del detalle de la oferta en especifico
                     reqDeta = requests.get(oferta["url"])            
                     soup_deta = BeautifulSoup(reqDeta.text, "lxml")
-                    aviso_deta = soup_deta.find("div", {"class": "show-more-less-html__markup"}).text
-                    texto = unicodedata.normalize("NFKD",re.sub('[-(),*¿?/¡!+<>;%#|°=:]','',aviso_deta.upper())).encode("ascii","ignore").decode("utf-8",'ignore')
+                    aviso_deta = soup_deta.find("div", {"class": "show-more-less-html__markup"}).text+'.'
+                    texto= aviso_deta.replace("'","")
+                    texto = texto.replace("..",".")
+                    texto = unicodedata.normalize("NFKD",re.sub('[-(),*@¿?/¡!+<>;%#|°=:]','',texto.upper())).encode("ascii","ignore").decode("utf-8",'ignore')
                     if texto!=None:    
                         oferta["detalle"]=texto[0:7998]
                     # #--> descomentar esta linea para que se realice la insercion
@@ -77,14 +79,14 @@ def scraping_ofertas(con, url_principal, url_prefix, sufix_url, pagina_inicial, 
 def scraping_ofertadetalle(con,listaOferta):
     controller = Controller()
     i=0
-    for i in range(0,len(listaOferta)-1):
+    for i in range(0,len(listaOferta)):
         oferta = {}
         oferta["id_oferta"] =  listaOferta[i]["id_oferta"]
         lista = listaOferta[i]["detalle"].split(sep='.')
         #print(lista)
         oferta["descripcion_tupla"]=""
         j=0
-        for j in range(0,len(lista)-1):
+        for j in range(0,len(lista)):
             oferta["descripcion_tupla"]=lista[j][0:1998]
             if (len(oferta["descripcion_tupla"])>=3):
             # print(".................................OFERTA..........................................")

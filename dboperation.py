@@ -101,21 +101,29 @@ class DBOfertadetalle:
             contenido = str(cur.fetchone()[0])
             cur.close()
             mydb.close()
-            if (oferta_detalle["descripcion_tupla"] in contenido ):                   
-                try:
-                    mydb = connection.connect()
-                    cur = mydb.cursor()                                    
-                    sql = "INSERT INTO OFERTA_DETALLE (id_oferta,descripcion,fecha_creacion,fecha_modificacion) VALUES (%s,%s,current_date,current_date)"            
-                    params = (oferta_detalle["id_oferta"],oferta_detalle["descripcion_tupla"])
-                    cur.execute(sql, params)        
-                    mydb.commit()  
-                    cur.close()
-                    mydb.close()                           
+            if (oferta_detalle["descripcion_tupla"] in contenido  ):
+                mydb = connection.connect()
+                cur = mydb.cursor()
+                sql0= "SELECT COUNT(descripcion) from oferta_detalle where descripcion ='"+str(oferta_detalle["descripcion_tupla"])+"' AND id_oferta ='"+str(oferta_detalle["id_oferta"])+"'"
+                cur.execute(sql0)
+                duplicidad = int(cur.fetchone()[0])
+                cur.close()
+                mydb.close()
+                if(duplicidad ==0):                  
+                    try:
+                        mydb = connection.connect()
+                        cur = mydb.cursor()                                    
+                        sql = "INSERT INTO OFERTA_DETALLE (id_oferta,descripcion,fecha_creacion,fecha_modificacion) VALUES (%s,%s,current_date,current_date)"            
+                        params = (oferta_detalle["id_oferta"],oferta_detalle["descripcion_tupla"])
+                        cur.execute(sql, params)        
+                        mydb.commit()  
+                        cur.close()
+                        mydb.close()                           
 
-                except (Exception, psycopg2.DatabaseError) as error:                
-                        print ("-------------Exception, psycopg2.DatabaseError-------------------")
-                        print (error)
-                        mydb.close()  
+                    except (Exception, psycopg2.DatabaseError) as error:                
+                            print ("-------------Exception, psycopg2.DatabaseError-------------------")
+                            print (error)
+                            mydb.close()  
                         
         return 1
        
