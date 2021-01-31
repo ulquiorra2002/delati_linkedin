@@ -85,21 +85,38 @@ class DBOfertadetalle:
     def __init__(self):
         pass
     #strip() devuelve una cadena eliminando los caracteres iniciales como los finlaes 
-    def insert_ofertadetalle(self, connection, oferta_detalle):        
-        try:
+    def insert_ofertadetalle(self, connection, oferta_detalle):
+        mydb = connection.connect()
+        cur = mydb.cursor()
+        sql0= "SELECT COUNT(id_oferta) FROM oferta WHERE id_oferta='"+str(oferta_detalle["id_oferta"])+"'"
+        cur.execute(sql0)
+        conteo = int(cur.fetchone()[0])
+        cur.close()
+        mydb.close() 
+        if(conteo!=0):
             mydb = connection.connect()
-            cur = mydb.cursor()                                    
-            sql = "INSERT INTO OFERTA_DETALLE (id_oferta,descripcion,fecha_creacion,fecha_modificacion) VALUES (%s,%s,current_date,current_date)"            
-            params = (oferta_detalle["id_oferta"],oferta_detalle["descripcion_tupla"])
-            cur.execute(sql, params)        
-            mydb.commit()  
+            cur = mydb.cursor()
+            sql0= "SELECT oferta_detalle FROM oferta WHERE id_oferta='"+str(oferta_detalle["id_oferta"])+"'"
+            cur.execute(sql0)
+            contenido = str(cur.fetchone()[0])
             cur.close()
-            mydb.close()                           
+            mydb.close()
+            if (oferta_detalle["descripcion_tupla"] in contenido ):                   
+                try:
+                    mydb = connection.connect()
+                    cur = mydb.cursor()                                    
+                    sql = "INSERT INTO OFERTA_DETALLE (id_oferta,descripcion,fecha_creacion,fecha_modificacion) VALUES (%s,%s,current_date,current_date)"            
+                    params = (oferta_detalle["id_oferta"],oferta_detalle["descripcion_tupla"])
+                    cur.execute(sql, params)        
+                    mydb.commit()  
+                    cur.close()
+                    mydb.close()                           
 
-        except (Exception, psycopg2.DatabaseError) as error:                
-                print ("-------------Exception, psycopg2.DatabaseError-------------------")
-                print (error)
-                mydb.close()                  
+                except (Exception, psycopg2.DatabaseError) as error:                
+                        print ("-------------Exception, psycopg2.DatabaseError-------------------")
+                        print (error)
+                        mydb.close()  
+                        
         return 1
        
 

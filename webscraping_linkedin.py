@@ -58,41 +58,11 @@ def scraping_ofertas(con, url_principal, url_prefix, sufix_url, pagina_inicial, 
                     # Accede al contenido HTML del detalle de la oferta en especifico
                     reqDeta = requests.get(oferta["url"])            
                     soup_deta = BeautifulSoup(reqDeta.text, "lxml")
-                    aviso_deta = soup_deta.find("div", {"class": "show-more-less-html__markup"}).find_all("li")
-                    aviso_deta2 = soup_deta.find("div", {"class": "show-more-less-html__markup"}).find_all("p")
-                    texto = ''
-                    if aviso_deta!=[]:
-                        for i in range (0,len(aviso_deta)-1):
-                            texto = texto+str(aviso_deta[i])+'.'
-                        texto = texto.replace(".NET","")
-                        texto = texto.replace("<strong>","")
-                        texto = texto.replace("</strong>","")
-                        texto = texto.replace("<li>","")
-                        texto = texto.replace("<br>","")
-                        texto = texto.replace("<br/>","")
-                        texto = texto.replace("</u>","")
-                        texto = texto.replace("<p>", "")
-                        texto = texto.replace("</p>", "")
-                        texto = texto.replace("</li>", "")
-                        texto = unicodedata.normalize("NFKD",re.sub('[-(),*¿?/¡!+<>;%#|°=:]','',texto.upper())).encode("ascii","ignore").decode("utf-8",'ignore')
-                        if texto!=None:    
-                            oferta["detalle"]=texto[0:7998]
-                    else:
-                        for i in range (0,len(aviso_deta2)-1):
-                            texto = texto+str(aviso_deta2[i])+'.'
-                        texto = texto.replace(".NET","")
-                        texto = texto.replace("<strong>","")
-                        texto = texto.replace("</strong>","")
-                        texto = texto.replace("<li>","")
-                        texto = texto.replace("<br>","")
-                        texto = texto.replace("<br/>","")
-                        texto = texto.replace("<p>", "")
-                        texto = texto.replace("</p>", "")
-                        texto = unicodedata.normalize("NFKD",re.sub('[-(),*¿?/¡!+<>;%#|°=:]','',texto.upper())).encode("ascii","ignore").decode("utf-8",'ignore')
-                        if texto!=None:    
-                            oferta["detalle"]=texto[0:7998]                    
-
-                    #--> descomentar esta linea para que se realice la insercion
+                    aviso_deta = soup_deta.find("div", {"class": "show-more-less-html__markup"}).text
+                    texto = unicodedata.normalize("NFKD",re.sub('[-(),*¿?/¡!+<>;%#|°=:]','',aviso_deta.upper())).encode("ascii","ignore").decode("utf-8",'ignore')
+                    if texto!=None:    
+                        oferta["detalle"]=texto[0:7998]
+                    # #--> descomentar esta linea para que se realice la insercion
                     oferta["id_oferta"]=controller.registrar_oferta(con, oferta)
                     lista_oferta.append(oferta)
         else:
@@ -111,14 +81,15 @@ def scraping_ofertadetalle(con,listaOferta):
         oferta = {}
         oferta["id_oferta"] =  listaOferta[i]["id_oferta"]
         lista = listaOferta[i]["detalle"].split(sep='.')
-        print(lista)
+        #print(lista)
         oferta["descripcion_tupla"]=""
         j=0
         for j in range(0,len(lista)-1):
             oferta["descripcion_tupla"]=lista[j][0:1998]
+            if (len(oferta["descripcion_tupla"])>=3):
             # print(".................................OFERTA..........................................")
             # print(oferta)
-            controller.registrar_oferta_detalle(con,oferta)
+                controller.registrar_oferta_detalle(con,oferta)
 
 
 def replace_quote(list):
