@@ -32,7 +32,6 @@ def scraping_ofertas(con, url_principal, url_busqueda, sufix_url, pagina_inicial
     i=1
     for i in range(pagina_inicial, cant_paginas):
         url_pagina = url_busqueda + str(i*25)
-        print(url_pagina)
         req = requests.get(url_pagina)
         soup = BeautifulSoup(req.text, "lxml")
         avisos=soup.find('ul', class_='jobs-search__results-list')
