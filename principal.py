@@ -12,10 +12,10 @@ def set_url_busqueda(carga,urlkeywords):
         urladiconal = "&location=Per%C3%BA"
         paginado = "&start="
 
-        carga["url_prefix"] = carga["url_principal"] + urlbusqueda + urlkeywords  
+        carga["url_prefix"] = carga["url_principal"] + urlbusqueda + urlkeywords 
         carga["url_sufix"] = ""
 
-        carga["url_busqueda"] = carga["url_principal"] + urlbusqueda + urlkeywords 
+        carga["url_busqueda"] = carga["url_principal"] + urlbusqueda + urlkeywords + urladiconal + paginado
 
 
 def connect_bd():
@@ -37,14 +37,14 @@ if __name__ == "__main__":
     carga["busqueda"] = ""
     urlkeywords = controller.dbkeywords.consultar_keywords(con)
     
-    for index in range(0,len(urlkeywords)-1):
+    for index in range(83,len(urlkeywords)):
             listaOferta={}
             set_url_busqueda(carga,urlkeywords[index])
             index_keywords = index + 1
             print(urlkeywords[index])
             carga["id_carga"] = controller.registrar_webscraping(con, carga, index_keywords)
 
-            listaOferta = webscraping_linkedin.scraping_ofertas(con, carga["url_principal"],carga["url_prefix"], carga["url_sufix"],
+            listaOferta = webscraping_linkedin.scraping_ofertas(con, carga["url_principal"],carga["url_busqueda"], carga["url_sufix"],
                                                     carga["pagina_inicial"], carga["cant_paginas"], carga["cant_ofertas"],
                                                     carga["id_carga"])
             webscraping_linkedin.scraping_ofertadetalle(con,listaOferta)
