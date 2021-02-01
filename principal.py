@@ -37,7 +37,7 @@ if __name__ == "__main__":
     carga["busqueda"] = ""
     urlkeywords = controller.dbkeywords.consultar_keywords(con)
     
-    for index in range(83,len(urlkeywords)):
+    for index in range(0,len(urlkeywords)):
             listaOferta={}
             set_url_busqueda(carga,urlkeywords[index])
             index_keywords = index + 1
